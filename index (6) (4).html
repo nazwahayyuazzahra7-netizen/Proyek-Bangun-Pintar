@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BangunPintar - 10 Kuis Alarm</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=JetBrains+Mono:wght@700&display=swap');
+  :root{ --bg:#0B0F1A; --card:#151B2A; --card2:#1E2738; --border:#243049; --primary:#FFC300; --text:#F8FAFC; --muted:#94A3B8; --success:#22C55E; --danger:#EF4444; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  .bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:600px;background:radial-gradient(ellipse at center,rgba(255,195,0,0.15) 0%,rgba(0,0,0,0) 70%);pointer-events:none;z-index:0;}
+  .login-page{position:fixed; inset:0; z-index:20000; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:20px;}
+  .login-page.hidden{display:none;}
+  .login-card{width:100%; max-width:400px; background:linear-gradient(180deg,var(--card) 0%,#111726 100%); border:1px solid var(--border); border-radius:28px; padding:32px 28px; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,0.6);}
+  .login-logo{width:64px; height:64px; background:var(--primary); border-radius:18px; display:grid; place-items:center; margin:0 auto 16px; font-size:32px; color:#000;}
+  .login-title{font-size:26px; font-weight:800; letter-spacing:-0.8px; margin-bottom:8px;}
+  .login-sub{font-size:14px; color:var(--muted); line-height:1.5; margin-bottom:28px;}
+  .google-btn-wrap{display:flex; justify-content:center; margin-bottom:16px; min-height:44px;}
+  .btn-google-custom{width:100%; background:#fff; color:#000; border:none; border-radius:14px; padding:14px 16px; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition:0.2s;}
+  .btn-google-custom:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(255,255,255,0.15);}
+  .divider{display:flex; align-items:center; gap:12px; margin:20px 0; color:var(--muted); font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase;}
+  .divider::before,.divider::after{content:''; flex:1; height:1px; background:var(--border);}
+  .demo-login-form{display:grid; gap:10px; text-align:left;}
+  .demo-login-form label{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--muted);}
+  .demo-login-form input{width:100%; background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:14px; color:var(--text); font-family:inherit; font-weight:600; font-size:14px; outline:none;}
+  .demo-login-form input:focus{border-color:var(--primary);}
+  .btn-demo{width:100%; background:var(--card2); border:1px solid var(--border); color:var(--text); border-radius:14px; padding:14px; font-weight:700; cursor:pointer; margin-top:4px;}
+  .login-foot{margin-top:20px; font-size:11px; color:var(--muted); line-height:1.5;} .login-foot b{color:var(--primary);}
+  .container{max-width:520px; margin:0 auto; padding:20px 20px 100px; position:relative; z-index:1;}
+  .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;}
+  .logo{display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px; letter-spacing:-0.5px;}
+  .logo-icon{width:40px; height:40px; background:var(--primary); border-radius:12px; display:grid; place-items:center; color:#000; font-size:22px;}
+  .user-menu{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--border); padding:6px 6px 6px 10px; border-radius:100px; cursor:pointer; position:relative;}
+  .user-avatar{width:32px; height:32px; border-radius:50%; object-fit:cover; background:var(--card2);}
+  .user-info{text-align:left; max-width:110px;} .user-name{font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100px;} .user-email{font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100px;}
+  .dropdown{position:absolute; top:48px; right:0; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:8px; width:180px; display:none; z-index:100; box-shadow:0 20px 40px rgba(0,0,0,0.5);} .dropdown.show{display:block;}
+  .dropdown button{width:100%; text-align:left; background:none; border:none; color:var(--text); padding:10px 12px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:flex; gap:8px; align-items:center;} .dropdown button:hover{background:var(--card2);} .dropdown button.danger{color:var(--danger);}
+  .clock-card{background:linear-gradient(180deg,var(--card) 0%,#111726 100%); border:1px solid var(--border); border-radius:28px; padding:28px 24px; text-align:center; margin-bottom:24px; box-shadow:0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);}
+  .current-time{font-family:'JetBrains Mono',monospace; font-size:64px; font-weight:800; letter-spacing:-3px; line-height:1; margin-bottom:6px;} .current-date{color:var(--muted); font-size:14px; font-weight:500;}
+  .next-alarm{margin-top:18px; background:rgba(255,195,0,0.08); border:1px dashed rgba(255,195,0,0.3); border-radius:14px; padding:10px; font-size:13px; color:var(--primary);}
+  .section-title{font-size:15px; font-weight:700; margin:24px 0 12px; display:flex; justify-content:space-between; align-items:center;} .section-title span{color:var(--muted); font-weight:500; font-size:12px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:20px; padding:18px;}
+  .form-grid{display:grid; gap:14px;} .input-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .field label{display:block; font-size:11px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;}
+  .field input,.field select{width:100%; background:var(--card2); border:1px solid var(--border); border-radius:12px; padding:14px; color:var(--text); font-family:inherit; font-weight:600; font-size:15px; outline:none; transition:0.2s;}
+  .field input:focus,.field select:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(255,195,0,0.15);}
+  .quiz-options{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .quiz-opt{background:var(--card2); border:1.5px solid var(--border); border-radius:12px; padding:10px 12px; cursor:pointer; text-align:left; transition:0.2s; position:relative; overflow:hidden;}
+  .quiz-opt.active{border-color:var(--primary); background:rgba(255,195,0,0.1);} .quiz-opt .icon{font-size:18px; margin-bottom:4px;} .quiz-opt .t{font-size:12px; font-weight:700; line-height:1.2;} .quiz-opt .d{font-size:10px; color:var(--muted); margin-top:2px; line-height:1.2;}
+  .quiz-opt .num{position:absolute; top:6px; right:8px; font-size:9px; font-weight:800; background:var(--border); color:var(--muted); width:16px; height:16px; border-radius:50%; display:grid; place-items:center;}
+  .quiz-opt.active .num{background:var(--primary); color:#000;}
+  .btn-primary{width:100%; background:var(--primary); color:#000; border:none; border-radius:14px; padding:16px; font-weight:800; font-size:15px; cursor:pointer; letter-spacing:-0.2px; transition:0.2s; display:flex; align-items:center; justify-content:center; gap:8px;}
+  .btn-primary:active{transform:scale(0.98);} .btn-primary:disabled{opacity:0.5;}
+  .alarm-list{display:grid; gap:10px;}
+  .alarm-item{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; transition:0.2s;}
+  .alarm-item.disabled{opacity:0.5;} .alarm-time{font-family:'JetBrains Mono',monospace; font-size:28px; font-weight:800; letter-spacing:-1px;}
+  .alarm-meta{font-size:12px; color:var(--muted); margin-top:2px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;} .alarm-meta .pill{background:var(--card2); border:1px solid var(--border); padding:2px 8px; border-radius:100px; font-size:10px; font-weight:700; text-transform:uppercase;}
+  .toggle{width:48px; height:28px; background:var(--card2); border:1px solid var(--border); border-radius:100px; position:relative; cursor:pointer; transition:0.3s;} .toggle::after{content:''; position:absolute; top:2px; left:2px; width:22px; height:22px; background:#fff; border-radius:50%; transition:0.3s; box-shadow:0 2px 6px rgba(0,0,0,0.3);} .toggle.on{background:var(--primary); border-color:var(--primary);} .toggle.on::after{transform:translateX(20px); background:#000;}
+  .stats-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;} .stat{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; text-align:center;} .stat b{font-size:20px; display:block;} .stat span{font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:700; letter-spacing:0.5px;}
+  .alarm-overlay{position:fixed; inset:0; z-index:9999; background:#0B0F1A; display:none; flex-direction:column; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;}
+  .alarm-overlay.active{display:flex;} .alarm-overlay-top{background:linear-gradient(180deg,#FF3B30 0%,#B91C1C 100%); padding:30px 24px 24px; text-align:center; animation:pulseBg 1s infinite alternate; flex-shrink:0; position:sticky; top:0; z-index:2; box-shadow:0 10px 30px rgba(0,0,0,0.3);}
+  @keyframes pulseBg{0%{filter:brightness(1)}100%{filter:brightness(1.2)}} .alarm-overlay-top .time{font-family:'JetBrains Mono'; font-size:52px; font-weight:800; letter-spacing:-2px;} .alarm-overlay-top .label{font-size:14px; opacity:0.9; margin-top:4px; font-weight:600;}
+  .alarm-overlay-body{flex:1; padding:24px 24px 40px; display:flex; flex-direction:column; justify-content:flex-start; max-width:480px; margin:0 auto; width:100%; overflow-y:auto; overflow-x:hidden; min-height:0; -webkit-overflow-scrolling:touch;}
+  .quiz-card{background:var(--card); border:1px solid var(--border); border-radius:24px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.5); margin:auto 0; width:100%; max-height:none; overflow:visible;}
+  .quiz-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;} .quiz-badge{background:var(--primary); color:#000; padding:6px 12px; border-radius:100px; font-size:11px; font-weight:800; letter-spacing:0.5px;} .snooze-count{font-size:12px; color:var(--muted); font-weight:600;}
+  .quiz-question{font-size:22px; font-weight:800; line-height:1.25; margin-bottom:8px; letter-spacing:-0.3px;} .quiz-hint{font-size:13px; color:var(--muted); margin-bottom:20px; line-height:1.4;}
+  .quiz-input{width:100%; background:var(--bg); border:2px solid var(--border); border-radius:14px; padding:18px; font-size:20px; font-weight:800; font-family:'JetBrains Mono'; color:var(--text); text-align:center; outline:none; transition:0.2s; letter-spacing:1px;}
+  .quiz-input:focus{border-color:var(--primary);} .quiz-input.shake{animation:shake 0.4s;} @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  .quiz-actions{display:grid; grid-template-columns:1fr 1.5fr; gap:12px; margin-top:16px;} .btn-snooze{background:var(--card2); border:1px solid var(--border); color:var(--text); border-radius:14px; padding:16px; font-weight:700; cursor:pointer;}
+  .memory-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:20px 0;} .memory-cell{aspect-ratio:1; background:var(--card2); border:2px solid var(--border); border-radius:14px; display:grid; place-items:center; font-size:28px; cursor:pointer; transition:0.15s;} .memory-cell.active{background:var(--primary); border-color:var(--primary); transform:scale(0.95);}
+  .puzzle-grid{display:grid; gap:8px; margin:18px 0; background:var(--bg); padding:10px; border-radius:16px; border:1px solid var(--border);} .puzzle-tile{aspect-ratio:1; background:var(--card2); border:2px solid var(--border); border-radius:12px; display:grid; place-items:center; font-family:'JetBrains Mono'; font-size:22px; font-weight:800; cursor:pointer; transition:0.15s; user-select:none; color:var(--text);} .puzzle-tile:not(.empty):hover{border-color:var(--primary); transform:scale(1.02); background:var(--card);} .puzzle-tile.empty{background:transparent; border:2px dashed var(--border); cursor:default;} .puzzle-tile.correct{background:rgba(34,197,94,0.15); border-color:var(--success); color:var(--success);}
+  .puzzle-stats{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted); margin-bottom:8px; font-weight:600;} .puzzle-stats b{color:var(--text); font-family:'JetBrains Mono'; font-size:14px;}
+  .typing-display{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px; font-size:14px; line-height:1.5; margin-bottom:12px; color:var(--muted);} .typing-display b{color:var(--text);}
+  /* NEW QUIZ STYLES */
+  .color-word{font-size:48px; font-weight:900; letter-spacing:-1px; text-align:center; padding:20px; background:var(--bg); border-radius:16px; border:1px solid var(--border); margin:12px 0; font-family:'Plus Jakarta Sans';}
+  .color-options{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;} .color-btn{padding:14px; border-radius:12px; border:2px solid var(--border); background:var(--card2); color:var(--text); font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:8px; transition:0.2s;} .color-btn:hover{border-color:var(--primary); transform:scale(1.02);} .color-dot{width:18px; height:18px; border-radius:50%; flex-shrink:0; border:2px solid rgba(255,255,255,0.2);}
+  .sort-grid{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:16px 0;} .sort-tile{min-width:56px; height:56px; background:var(--card2); border:2px solid var(--border); border-radius:12px; display:grid; place-items:center; font-family:'JetBrains Mono'; font-size:20px; font-weight:800; cursor:pointer; transition:0.2s;} .sort-tile:hover{border-color:var(--primary);} .sort-tile.selected{background:var(--primary); color:#000; border-color:var(--primary);} .sort-tile.correct{background:var(--success); color:#fff; border-color:var(--success); cursor:default;}
+  .sort-progress{display:flex; gap:6px; justify-content:center; margin:12px 0; flex-wrap:wrap;} .sort-progress-item{padding:6px 12px; background:var(--bg); border:1px solid var(--border); border-radius:100px; font-family:'JetBrains Mono'; font-size:12px; font-weight:700;}
+  .emoji-display{font-size:42px; text-align:center; padding:20px; background:var(--bg); border-radius:16px; border:1px solid var(--border); margin:12px 0; letter-spacing:4px; line-height:1.3;}
+  .focus-area{position:relative; width:100%; height:260px; background:var(--bg); border:2px dashed var(--border); border-radius:16px; margin:16px 0; overflow:hidden; touch-action:none;}
+  .focus-target{position:absolute; width:64px; height:64px; background:var(--primary); border-radius:50%; display:grid; place-items:center; font-weight:800; color:#000; cursor:pointer; box-shadow:0 4px 20px rgba(255,195,0,0.4); transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1); user-select:none; font-size:20px;}
+  .focus-target:active{transform:scale(0.9);} .focus-bar{height:10px; background:var(--card2); border-radius:100px; overflow:hidden; margin:12px 0;} .focus-bar-fill{height:100%; background:var(--primary); transition:0.3s; width:0%;}
+  .trivia-options{display:grid; gap:10px; margin-top:12px;} .trivia-opt{padding:14px 16px; background:var(--card2); border:2px solid var(--border); border-radius:12px; text-align:left; font-weight:600; font-size:14px; cursor:pointer; transition:0.2s; display:flex; gap:10px; align-items:center;} .trivia-opt:hover{border-color:var(--primary); background:var(--card);} .trivia-opt .letter{width:28px; height:28px; background:var(--bg); border:1px solid var(--border); border-radius:8px; display:grid; place-items:center; font-size:12px; font-weight:800; flex-shrink:0;} .trivia-opt.correct{border-color:var(--success); background:rgba(34,197,94,0.15);} .trivia-opt.wrong{border-color:var(--danger); background:rgba(239,68,68,0.15);}
+  .code-display{font-family:'JetBrains Mono'; font-size:48px; font-weight:800; letter-spacing:12px; text-align:center; padding:24px; background:var(--bg); border:2px solid var(--primary); border-radius:16px; margin:12px 0; color:var(--primary);} .code-dots{display:flex; gap:12px; justify-content:center; margin:16px 0;} .code-dot{width:16px; height:16px; border-radius:50%; background:var(--card2); border:2px solid var(--border); transition:0.2s;} .code-dot.filled{background:var(--primary); border-color:var(--primary);}
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--text); color:var(--bg); padding:12px 18px; border-radius:100px; font-weight:700; font-size:13px; z-index:30000; transition:0.4s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 10px 30px rgba(0,0,0,0.4); opacity:0;} .toast.show{transform:translateX(-50%) translateY(0); opacity:1;}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">⏰</div>
+    <div class="login-title">Selamat Datang di<br>BangunPintar</div>
+    <div class="login-sub">8 Kuis Anti Malas + Atur Jumlah Soal 1-5x! Login dengan Gmail.</div>
+    <div class="google-btn-wrap" id="googleBtnWrap"><div id="googleBtn"></div><button class="btn-google-custom" id="customGoogleBtn">Lanjutkan dengan Google</button></div>
+    <div class="divider">atau demo tanpa setup</div>
+    <div class="demo-login-form"><div><label>Email Gmail</label><input type="email" id="demoEmail" placeholder="nama@gmail.com"></div><div><label>Nama Lengkap</label><input type="text" id="demoName" placeholder="Budi Santoso"></div><button class="btn-demo" id="demoLoginBtn">🚀 Masuk Demo</button></div>
+    <div class="login-foot">🔒 Data per akun Gmail. Ganti GOOGLE_CLIENT_ID di kode untuk production.</div>
+  </div>
+</div>
+<div class="container" id="appContainer" style="display:none;">
+  <div class="header"><div class="logo"><div class="logo-icon">⏰</div> BangunPintar</div><div class="user-menu" id="userMenuBtn"><div class="user-info"><div class="user-name" id="userName">...</div><div class="user-email" id="userEmail">...</div></div><img class="user-avatar" id="userAvatar" src="" alt=""><div style="font-size:12px; color:var(--muted);">▼</div><div class="dropdown" id="userDropdown"><button id="profileBtn">👤 <span id="dropdownEmail"></span></button><button id="logoutBtn" class="danger">🚪 Logout</button></div></div></div>
+  <div class="clock-card"><div class="current-time" id="currentTime">00:00:00</div><div class="current-date" id="currentDate">Memuat...</div><div class="next-alarm" id="nextAlarmInfo">⏰ Belum ada alarm aktif</div></div>
+  <div class="section-title">Atur Alarm Baru <span id="userGreeting">10 Kuis Tersedia</span></div>
+  <div class="card">
+    <div class="form-grid">
+      <div class="input-row"><div class="field"><label>Jam Bangun</label><input type="time" id="alarmTime" value="05:00"></div><div class="field"><label>Label</label><input type="text" id="alarmLabel" placeholder="Subuh / Sekolah / Kerja" value="Bangun Pagi"></div></div>
+      <div class="field">
+        <label>Pilih Metode Mati - 8 KUIS (Bisa Pilih Banyak!)</label>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:8px; line-height:1.4;">💡 Kalau Jumlah Soal = 3, kamu bisa pilih 3 kuis beda! Contoh: Soal 1 Matematika, Soal 2 Logika, Soal 3 Emoji. Tap untuk pilih/hapus.</div>
+        <div class="quiz-options" id="quizOptions">
+          <div class="quiz-opt active" data-type="math"><div class="num">1</div><div class="icon">🧮</div><div class="t">Matematika</div><div class="d">Hitung cepat</div></div>
+          <div class="quiz-opt" data-type="logic"><div class="num">2</div><div class="icon">🧩</div><div class="t">Logika Pola</div><div class="d">Lanjutin pola angka</div></div>
+          <div class="quiz-opt" data-type="typing"><div class="num">3</div><div class="icon">⌨️</div><div class="t">Ketik</div><div class="d">Ketik kalimat</div></div>
+          <div class="quiz-opt" data-type="puzzle"><div class="num">4</div><div class="icon">🔤</div><div class="t">Susun Kata</div><div class="d">Anagram acak</div></div>
+          <div class="quiz-opt" data-type="reverse"><div class="num">5</div><div class="icon">🔠</div><div class="t">Kata Terbalik</div><div class="d">Balik kata ini</div></div>
+          <div class="quiz-opt" data-type="sort"><div class="num">6</div><div class="icon">🔢</div><div class="t">Urutkan Angka</div><div class="d">Kecil ke besar</div></div>
+          <div class="quiz-opt" data-type="emoji"><div class="num">7</div><div class="icon">🧩</div><div class="t">Emoji Rebus</div><div class="d">Tebak dari emoji</div></div>
+          <div class="quiz-opt" data-type="trivia"><div class="num">8</div><div class="icon">🌍</div><div class="t">Wawasan Umum</div><div class="d">Kuis pengetahuan</div></div>
+        </div>
+        <div id="selectedQuizInfo" style="margin-top:12px; padding:10px 14px; background:rgba(255,195,0,0.08); border:1px solid rgba(255,195,0,0.2); border-radius:12px; font-size:12px; line-height:1.5;">
+          <span id="selectedQuizList">1. Matematika</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Jumlah Soal Wajib Benar (1-5) 🔥</label>
+        <select id="questionCount">
+          <option value="1">1 Soal - Pemanasan</option>
+          <option value="2">2 Soal - Lumayan</option>
+          <option value="3" selected>3 Soal - Standar Anti Malas</option>
+          <option value="4">4 Soal - Sulit Bangun!</option>
+          <option value="5">5 Soal - Mode Neraka! Harus benar 5x baru mati!</option>
+        </select>
+        <div style="font-size:11px; color:var(--muted); margin-top:6px;">💡 Pilih 5 soal = harus jawab benar 5x berturut-turut baru alarm mati. Salah 1x = ulang soal itu!</div>
+      </div>
+      <div class="input-row"><div class="field"><label>Tingkat Kesulitan</label><select id="difficulty"><option value="easy">Mudah - Pemanasan</option><option value="medium" selected>Sedang - Butuh mikir</option><option value="hard">Sulit - Otak nyala</option><option value="hell">Neraka - Auto melek!</option></select></div><div class="field"><label>PILIHAN NADA DERING</label><select id="ringtone"><option value="digital">Digital Beep</option><option value="alarm">Alarm Klasik</option><option value="aggressive">Agresif</option></select></div></div>
+      <button class="btn-primary" id="setAlarmBtn">➕ Pasang Alarm 10 Kuis</button>
+    </div>
+  </div>
+  <div class="section-title">Alarm Aktif <span id="alarmCount">0 alarm</span></div><div class="alarm-list" id="alarmList"></div>
+  <div class="section-title" style="margin-top:28px;">Statistik Kamu</div>
+  <div class="stats-grid"><div class="stat"><b id="statTotal">0</b><span>Total Bangun</span></div><div class="stat"><b id="statOnTime">0%</b><span>Tepat Waktu</span></div><div class="stat"><b id="statStreak">0</b><span>🔥 Streak</span></div></div>
+  <div style="margin-top:20px; padding:14px; background:rgba(255,195,0,0.06); border:1px solid rgba(255,195,0,0.15); border-radius:14px; font-size:11px; color:var(--muted); line-height:1.5;">💡 <b style="color:var(--primary)">8 KUIS BARU + Jumlah Soal 1-5x:</b> 1.Matematika 2.Logika Pola 3.Ketik 4.Susun Kata 5.Kata Terbalik 6.Urutkan Angka 7.Emoji Rebus 8.Wawasan Umum. Pilih 5 soal = harus benar 5x baru mati! Double-klik jam untuk test!</div>
+</div>
+<div class="alarm-overlay" id="alarmOverlay">
+  <div class="alarm-overlay-top"><div class="time" id="overlayTime">05:00</div><div class="label" id="overlayLabel">BANGUN!</div><div style="margin-top:12px; font-size:12px; opacity:0.8;">🔊 Selesaikan kuis untuk mematikan</div></div>
+  <div class="alarm-overlay-body"><div class="quiz-card"><div class="quiz-header"><div class="quiz-badge" id="quizBadge">MATEMATIKA • SEDANG</div><div class="snooze-count" id="snoozeInfo">Snooze: 0/3</div></div><div class="quiz-question" id="quizQuestion">Soal</div><div class="quiz-hint" id="quizHint">Petunjuk</div><div id="quizContent"></div><div class="quiz-actions"><button class="btn-snooze" id="snoozeBtn">😴 Snooze 5m</button><button class="btn-primary" id="submitQuizBtn">Matikan Alarm →</button></div></div></div>
+</div>
+<div class="toast" id="toast">OK</div>
+<script>
+const GOOGLE_CLIENT_ID="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"; const IS_CLIENT_ID_SET=!GOOGLE_CLIENT_ID.includes("YOUR_GOOGLE");
+const $=s=>document.querySelector(s); const $$=s=>document.querySelectorAll(s);
+function showToast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function parseJwt(token){ try{ const b64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'); return JSON.parse(decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''))); }catch{ return null; } }
+function getUserKey(base){ const u=JSON.parse(localStorage.getItem('bp_user')||'null'); return u?`${base}_${u.email}`:base; }
+let currentUser=JSON.parse(localStorage.getItem('bp_user')||'null');
+function checkAuthState(){ currentUser=JSON.parse(localStorage.getItem('bp_user')||'null'); if(currentUser){ hideLoginPage(); loadUserToUI(); initApp(); } else { showLoginPage(); initGoogleLogin(); } }
+function showLoginPage(){ $('#loginPage').classList.remove('hidden'); $('#appContainer').style.display='none'; }
+function hideLoginPage(){ $('#loginPage').classList.add('hidden'); $('#appContainer').style.display='block'; }
+function initGoogleLogin(){ if(!IS_CLIENT_ID_SET){ $('#googleBtn').style.display='none'; return; } let a=0; const tryInit=()=>{ a++; if(typeof google!=='undefined'&&google.accounts){ google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID, callback:handleGoogleCredential, auto_select:false}); google.accounts.id.renderButton(document.getElementById('googleBtn'),{theme:'outline', size:'large', shape:'pill', text:'signin_with', width:320}); $('#customGoogleBtn').style.display='none'; google.accounts.id.prompt(); } else if(a<20) setTimeout(tryInit,500); }; tryInit(); }
+function handleGoogleCredential(r){ const p=parseJwt(r.credential); if(!p){ showToast('Login gagal'); return; } loginSuccess({email:p.email,name:p.name,picture:p.picture,sub:p.sub,provider:'google',loginAt:new Date().toISOString()}); }
+function loginSuccess(u){ localStorage.setItem('bp_user', JSON.stringify(u)); currentUser=u; showToast(`✅ Hai ${u.name}!`); hideLoginPage(); loadUserToUI(); initApp(); }
+function loadUserToUI(){ if(!currentUser) return; $('#userName').textContent=currentUser.name||currentUser.email.split('@')[0]; $('#userEmail').textContent=currentUser.email; $('#dropdownEmail').textContent=currentUser.email; $('#userAvatar').src=currentUser.picture||`https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name||'User')}&background=FFC300&color=000`; $('#userGreeting').textContent=`Halo, ${currentUser.name.split(' ')[0]}! • 8 Kuis • ${totalQuestionsNeeded}x Soal`; }
+$('#customGoogleBtn').addEventListener('click',()=>{ if(IS_CLIENT_ID_SET&&typeof google!=='undefined') google.accounts.id.prompt(); else { showToast('⚠️ Pakai demo login di bawah'); $('#demoEmail').focus(); } });
+$('#demoLoginBtn').addEventListener('click',()=>{ const email=$('#demoEmail').value.trim(); const name=$('#demoName').value.trim(); if(!email||!email.includes('@')) return showToast('Email valid dong'); if(!name) return showToast('Nama dong'); const u={email:email.toLowerCase(),name,picture:`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=FFC300&color=000&bold=true`,sub:'demo_'+Date.now(),provider:'demo',loginAt:new Date().toISOString()}; loginSuccess(u); });
+$('#userMenuBtn').addEventListener('click',(e)=>{ e.stopPropagation(); $('#userDropdown').classList.toggle('show'); }); document.addEventListener('click',()=>$('#userDropdown').classList.remove('show'));
+$('#logoutBtn').addEventListener('click',()=>{ if(confirm('Logout? Data tetap tersimpan.')){ localStorage.removeItem('bp_user'); location.reload(); } });
+
+let alarms=[], streak=0, stats={total:0,onTime:0,questions:0}, selectedQuizTypes=['math'], ringingAlarm=null, currentQuiz=null, audioCtx=null, oscillators=[], gainNode=null, alarmInterval=null, snoozeCount=0, appInitialized=false;
+let totalQuestionsNeeded=3, currentQuestionProgress=1;
+let currentQuizSequence=[]; // urutan kuis yang dipilih untuk alarm yang bunyi
+
+function updateSelectedQuizUI(){
+  const count=parseInt($('#questionCount')?.value||'3');
+  const names={math:'Matematika',logic:'Logika Pola',typing:'Ketik',puzzle:'Susun Kata',reverse:'Kata Terbalik',sort:'Urutkan Angka',emoji:'Emoji Rebus',trivia:'Wawasan Umum'};
+  const shortNames={math:'🧮MTK',logic:'🧩Logika',typing:'⌨️Ketik',puzzle:'🔤Kata',reverse:'🔠Balik',sort:'🔢Urut',emoji:'🧩Emoji',trivia:'🌍Trivia'};
+  const listEl=$('#selectedQuizList');
+  const infoEl=$('#selectedQuizInfo');
+  
+  // Hitung jumlah per tipe
+  const countPerType={};
+  selectedQuizTypes.forEach(t=>{ countPerType[t]=(countPerType[t]||0)+1; });
+
+  // Update info text
+  if(listEl){
+    if(selectedQuizTypes.length===0){
+      listEl.innerHTML=`<span style="color:var(--danger);">Belum pilih kuis! Tap kuis di atas.</span>`;
+      if(infoEl) infoEl.style.borderColor='var(--danger)';
+    } else {
+      if(infoEl) infoEl.style.borderColor='rgba(255,195,0,0.2)';
+      const display=selectedQuizTypes.map((t,i)=>`${i+1}. ${names[t]||t}`).join(' → ');
+      const perTypeDisplay=Object.entries(countPerType).map(([t,c])=>`${names[t]} x${c}`).join(', ');
+      const remaining=count-selectedQuizTypes.length;
+      listEl.innerHTML=`
+        <b style="color:var(--primary);">${selectedQuizTypes.length}/${count} Soal Dipilih:</b> ${display}<br>
+        <span style="font-size:11px; color:var(--muted);">Rincian: ${perTypeDisplay}</span><br>
+        ${remaining>0?`<span style="color:var(--danger); font-size:11px;">⚠️ Kurang ${remaining} lagi! Tap kuis lagi (boleh sama) untuk tambah. Contoh: tap Mengetik 2x = 2 soal Mengetik</span>`:`<span style="color:var(--success); font-size:11px;">✅ Siap! ${count} soal akan muncul urut: ${display}</span>`}
+      `;
+    }
+  }
+
+  // Update visual active + count badge
+  $$('.quiz-opt').forEach(opt=>{
+    const type=opt.dataset.type;
+    const cnt=countPerType[type]||0;
+    const indices=[];
+    selectedQuizTypes.forEach((t,i)=>{ if(t===type) indices.push(i+1); });
+    
+    opt.classList.toggle('active', cnt>0);
+    const numEl=opt.querySelector('.num');
+    if(numEl){
+      if(cnt>0){
+        numEl.textContent=cnt>1?`${cnt}x`:`${indices[0]}`;
+        numEl.style.background='var(--primary)';
+        numEl.style.color='#000';
+        numEl.style.width=cnt>1?'28px':'16px';
+      } else {
+        const orig=opt.getAttribute('data-orig-num')||'';
+        numEl.textContent=orig;
+        numEl.style.background='';
+        numEl.style.color='';
+        numEl.style.width='16px';
+      }
+    }
+    // Tambah badge urutan kecil kalau dipilih lebih dari 1 tipe
+    let orderBadge=opt.querySelector('.order-badge');
+    if(cnt>0 && selectedQuizTypes.length>1){
+      if(!orderBadge){
+        orderBadge=document.createElement('div');
+        orderBadge.className='order-badge';
+        orderBadge.style.cssText='position:absolute; bottom:6px; left:8px; font-size:8px; font-weight:700; background:var(--card); border:1px solid var(--border); padding:2px 5px; border-radius:100px; color:var(--muted);';
+        opt.appendChild(orderBadge);
+      }
+      orderBadge.textContent=indices.join(',');
+      orderBadge.style.display='block';
+    } else if(orderBadge){
+      orderBadge.style.display='none';
+    }
+  });
+}
+
+function initApp(){
+  if(appInitialized) return; appInitialized=true;
+  alarms=JSON.parse(localStorage.getItem(getUserKey('bp_alarms'))||'[]'); streak=parseInt(localStorage.getItem(getUserKey('bp_streak'))||'0'); stats=JSON.parse(localStorage.getItem(getUserKey('bp_stats'))||'{"total":0,"onTime":0,"questions":0}');
+  updateClock(); setInterval(updateClock,1000); renderAlarms(); updateStatsUI();
+  // Save original numbers for UI
+  $$('.quiz-opt').forEach(opt=>{ const numEl=opt.querySelector('.num'); if(numEl) opt.setAttribute('data-orig-num', numEl.textContent); });
+  // Multi-select logic - BOLEH DUPLIKAT! 1 Math + 2 Typing untuk 3 soal
+  $$('.quiz-opt').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const type=el.dataset.type;
+      const count=parseInt($('#questionCount')?.value||'3');
+      if(selectedQuizTypes.length < count){
+        // Tambah 1 soal tipe ini (boleh duplikat)
+        selectedQuizTypes.push(type);
+        showToast(`➕ ${type} ditambah (${selectedQuizTypes.length}/${count}) - Tap lagi untuk tambah lagi!`);
+      } else {
+        // Sudah penuh
+        const idx=selectedQuizTypes.indexOf(type);
+        if(idx!==-1){
+          // Hapus satu instance tipe ini biar bisa ganti komposisi
+          selectedQuizTypes.splice(idx,1);
+          showToast(`➖ 1x ${type} dihapus (${selectedQuizTypes.length}/${count})`);
+        } else {
+          showToast(`⚠️ Sudah penuh ${count} soal! Tap kuis yang sudah dipilih untuk hapus 1.`);
+          return;
+        }
+      }
+      updateSelectedQuizUI();
+    });
+  });
+  // Ketika jumlah soal diubah, update UI dan batasi pilihan
+  $('#questionCount')?.addEventListener('change',()=>{
+    const count=parseInt($('#questionCount').value);
+    totalQuestionsNeeded=count;
+    // Kalau pilihan kuis lebih banyak dari jumlah soal, potong
+    if(selectedQuizTypes.length>count){
+      selectedQuizTypes=selectedQuizTypes.slice(0,count);
+      showToast(`✂️ Pilihan kuis dipotong jadi ${count} sesuai jumlah soal`);
+    }
+    // Kalau cuma 1 soal dan belum ada pilihan, default math
+    if(selectedQuizTypes.length===0) selectedQuizTypes=['math'];
+    updateSelectedQuizUI();
+    // Update greeting
+    const greet=$('#userGreeting'); if(greet) greet.textContent=`Halo, ${currentUser?.name?.split(' ')[0]||'Kamu'}! • ${count} Soal • Pilih ${count} Kuis`;
+  });
+  updateSelectedQuizUI();
+  $('#setAlarmBtn').addEventListener('click',setNewAlarm); $('#submitQuizBtn').addEventListener('click',checkAnswer); $('#snoozeBtn').addEventListener('click',doSnooze);
+  if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
+  setInterval(checkAlarms,1000);
+}
+function updateClock(){ const now=new Date(); const ct=$('#currentTime'); if(ct) ct.textContent=now.toLocaleTimeString('id-ID',{hour12:false}); const cd=$('#currentDate'); if(cd) cd.textContent=now.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); const active=alarms.filter(a=>a.enabled); if(active.length){ const next=active.sort((a,b)=>a.time.localeCompare(b.time))[0]; $('#nextAlarmInfo').textContent=`⏰ Berikutnya: ${next.time} - ${next.label} (${next.quizType}) • ${currentUser?.email}`; } else $('#nextAlarmInfo').textContent='⏰ Belum ada alarm aktif'; }
+function setNewAlarm(){ 
+  const time=$('#alarmTime').value; 
+  const label=$('#alarmLabel').value||'Bangun Pagi'; 
+  const difficulty=$('#difficulty').value; 
+  const ringtone=$('#ringtone').value;
+  const questionCount=parseInt($('#questionCount')?.value||'3');
+  if(!time) return showToast('Pilih jam dulu!'); 
+  if(selectedQuizTypes.length===0) return showToast('Pilih minimal 1 kuis!');
+  if(selectedQuizTypes.length!==questionCount){
+    if(!confirm(`Kamu pilih ${selectedQuizTypes.length} kuis tapi jumlah soal ${questionCount}. ${selectedQuizTypes.length<questionCount?'Kekurangan akan diulang otomatis.':'Kelebihan akan dipotong.'} Lanjut?`)){
+      return;
+    }
+  }
+  // Buat sequence kuis sesuai jumlah soal, ulang kalau kurang
+  let quizSequence=[...selectedQuizTypes];
+  while(quizSequence.length<questionCount){
+    // Ulang dari awal
+    quizSequence.push(selectedQuizTypes[quizSequence.length % selectedQuizTypes.length]);
+  }
+  quizSequence=quizSequence.slice(0,questionCount);
+  
+  const alarm={
+    id:Date.now(),
+    time,
+    label,
+    quizType:selectedQuizTypes[0], // backward compat
+    quizTypes:[...selectedQuizTypes],
+    quizSequence,
+    difficulty,
+    ringtone,
+    questionCount,
+    enabled:true,
+    created:new Date().toISOString(),
+    owner:currentUser?.email
+  }; 
+  alarms.push(alarm); saveAlarms(); renderAlarms(); 
+  const names={math:'Matematika',logic:'Logika',typing:'Ketik',puzzle:'Susun Kata',reverse:'Kata Terbalik',sort:'Urutkan',emoji:'Emoji',trivia:'Trivia'};
+  const seqNames=quizSequence.map(t=>names[t]||t).join('→');
+  showToast(`✅ Alarm ${time} [${seqNames} x${questionCount}] dipasang!`); 
+  if(navigator.vibrate) navigator.vibrate(100); 
+}
+function saveAlarms(){ localStorage.setItem(getUserKey('bp_alarms'), JSON.stringify(alarms)); }
+function saveStats(){ localStorage.setItem(getUserKey('bp_stats'), JSON.stringify(stats)); localStorage.setItem(getUserKey('bp_streak'), streak.toString()); }
+function renderAlarms(){ 
+  const list=$('#alarmList'); const countEl=$('#alarmCount'); 
+  if(countEl) countEl.textContent=`${alarms.length} alarm • ${currentUser?.email}`; 
+  if(!alarms.length){ list.innerHTML=`<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">Belum ada alarm untuk ${currentUser?.email}<br>Atur di atas untuk mulai.</div>`; return; } 
+  const names={math:'🧮MTK',logic:'🧩Logika',typing:'⌨️Ketik',puzzle:'🔤Kata',reverse:'🔠Balik',sort:'🔢Urut',emoji:'🧩Emoji',trivia:'🌍Trivia'};
+  list.innerHTML=alarms.map(a=>{
+    const seq=a.quizSequence||a.quizTypes||[a.quizType||'math'];
+    const seqDisplay=seq.map((t,i)=>`${i+1}.${names[t]||t}`).join(' ');
+    const qCount=a.questionCount||seq.length;
+    return `<div class="alarm-item ${a.enabled?'':'disabled'}"><div><div class="alarm-time">${a.time}</div><div class="alarm-meta"><span>${a.label}</span><span class="pill">${a.difficulty}</span><span class="pill" style="background:var(--primary); color:#000; border-color:var(--primary);">🔥 ${qCount}x SOAL</span></div><div style="font-size:10px; color:var(--muted); margin-top:4px; line-height:1.3;">${seqDisplay}</div></div><div style="display:flex;align-items:center;gap:12px;"><button onclick="deleteAlarm(${a.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;">🗑️</button><div class="toggle ${a.enabled?'on':''}" onclick="toggleAlarm(${a.id})"></div></div></div>`;
+  }).join(''); 
+}
+window.toggleAlarm=(id)=>{ alarms=alarms.map(a=>a.id===id?{...a,enabled:!a.enabled}:a); saveAlarms(); renderAlarms(); }
+window.deleteAlarm=(id)=>{ if(confirm('Hapus alarm ini?')){ alarms=alarms.filter(a=>a.id!==id); saveAlarms(); renderAlarms(); } }
+function checkAlarms(){ if(ringingAlarm) return; const now=new Date(); const hm=now.toTimeString().slice(0,5); const sec=now.getSeconds(); if(sec!==0) return; const matched=alarms.find(a=>a.enabled&&a.time===hm); if(matched) triggerAlarm(matched); }
+function triggerAlarm(alarm){ 
+  ringingAlarm=alarm; snoozeCount=0; 
+  totalQuestionsNeeded=alarm.questionCount|| (alarm.quizSequence?.length) || 3; 
+  currentQuestionProgress=1;
+  // Tentukan urutan kuis yang akan dipakai
+  currentQuizSequence=alarm.quizSequence || alarm.quizTypes || [alarm.quizType||'math'];
+  // Kalau urutan kurang dari total, ulang
+  while(currentQuizSequence.length < totalQuestionsNeeded){
+    currentQuizSequence.push(currentQuizSequence[currentQuizSequence.length % (alarm.quizTypes?.length||1)]);
+  }
+  currentQuizSequence=currentQuizSequence.slice(0,totalQuestionsNeeded);
+  const currentType=currentQuizSequence[0];
+  $('#overlayTime').textContent=alarm.time; 
+  $('#overlayLabel').textContent=alarm.label.toUpperCase(); 
+  $('#quizBadge').textContent=`${currentType.toUpperCase()} • ${alarm.difficulty.toUpperCase()} • 1/${totalQuestionsNeeded}`; 
+  $('#snoozeInfo').textContent=`Soal ${currentQuestionProgress}/${totalQuestionsNeeded} [${currentType}] • Snooze: ${snoozeCount}/3`; 
+  generateQuiz(currentType, alarm.difficulty); 
+  $('#alarmOverlay').classList.add('active'); 
+  document.body.style.overflow='hidden'; 
+  document.documentElement.style.overflow='hidden'; 
+  setTimeout(()=>{ const ov=$('#alarmOverlay'); if(ov) ov.scrollTop=0; },50); 
+  startAlarmSound(alarm.ringtone); 
+  if('Notification' in window && Notification.permission==='granted'){ new Notification('⏰ '+alarm.label,{body:`Hai ${currentUser?.name}, ${totalQuestionsNeeded} soal: ${currentQuizSequence.join('→')}!`, requireInteraction:true}); } 
+  if(navigator.vibrate) navigator.vibrate([1000,500,1000,500,2000]); 
+  history.pushState(null,'',location.href); 
+  window.onpopstate=()=>{ history.pushState(null,'',location.href); showToast('Selesaikan kuis dulu! 😤'); }; 
+}
+
+function generateQuiz(type,diff){
+  const content=$('#quizContent');
+  const rand=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+  const resetSubmit=()=>{ const btn=$('#submitQuizBtn'); if(btn){ btn.onclick=checkAnswer; btn.textContent='Matikan Alarm →'; btn.style.display='flex'; } };
+
+  if(type==='math'){
+    let a,b,c,question,answer;
+    if(diff==='easy'){ a=rand(1,20); b=rand(1,20); const op=Math.random()>0.5?'+':'-'; question=`${a} ${op} ${b} = ?`; answer=op==='+'?a+b:a-b; }
+    else if(diff==='medium'){ a=rand(6,15); b=rand(6,15); const ops=['x','+','-']; const op=ops[rand(0,2)]; if(op==='x'){ question=`${a} × ${b} = ?`; answer=a*b; } else if(op==='+'){ question=`${a*2} + ${b*3} = ?`; answer=a*2+b*3; } else { question=`${a*5} - ${b*2} = ?`; answer=a*5-b*2; } }
+    else if(diff==='hard'){ a=rand(12,25); b=rand(6,12); c=rand(2,9); question=`${a} × ${b} - ${c*3} = ?`; answer=a*b - c*3; }
+    else { a=rand(15,30); b=rand(12,20); c=rand(5,15); question=`(${a} + ${b}) × ${c} ÷ 3 = ?`; answer=Math.floor((a+b)*c/3); }
+    currentQuiz={type,answer:answer.toString()}; $('#quizQuestion').textContent=question; $('#quizHint').textContent='Hitung cepat! Salah = suara makin keras.'; content.innerHTML=`<input type="text" inputmode="numeric" class="quiz-input" id="quizInput" placeholder="Jawaban..." autocomplete="off">`; resetSubmit(); setTimeout(()=>$('#quizInput')?.focus(),100);
+  }
+  else if(type==='logic'){
+    // Logika Pola Angka - lanjutin pola
+    const patterns=[
+      {seq:[2,4,8,16], answer:'32', hint:'x2 terus', type:'x2'},
+      {seq:[1,3,6,10,15], answer:'21', hint:'+2,+3,+4,+5,+6', type:'triangular'},
+      {seq:[100,90,80,70], answer:'60', hint:'-10 terus', type:'-10'},
+      {seq:[3,6,9,12], answer:'15', hint:'+3 terus', type:'+3'},
+      {seq:[1,4,9,16], answer:'25', hint:'1²,2²,3²,4²,5²', type:'kuadrat'},
+      {seq:[5,10,20,40], answer:'80', hint:'x2', type:'x2'},
+      {seq:[2,3,5,8,12], answer:'17', hint:'+1,+2,+3,+4,+5', type:'+n'},
+      {seq:[1,1,2,3,5,8], answer:'13', hint:'Fibonacci', type:'fib'},
+      {seq:[10,20,30,40], answer:'50', hint:'+10', type:'+10'},
+      {seq:[64,32,16,8], answer:'4', hint:'÷2', type:'/2'}
+    ];
+    let pool=diff==='easy'?patterns.slice(0,4):diff==='medium'?patterns.slice(0,7):patterns;
+    const pat=pool[Math.floor(Math.random()*pool.length)];
+    currentQuiz={type, answer:pat.answer, seq:pat.seq, hint:pat.hint};
+    $('#quizQuestion').textContent=`Lanjutin Pola Ini! 🧩`; 
+    $('#quizHint').textContent=`Petunjuk: ${pat.hint} • Pola: ${pat.seq.join(', ')}, ...? • Soal ${currentQuestionProgress}/${totalQuestionsNeeded}`;
+    content.innerHTML=`
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:18px; text-align:center; margin:12px 0;">
+        <div style="font-family:'JetBrains Mono'; font-size:24px; font-weight:800; letter-spacing:2px; color:var(--text);">${pat.seq.join(' → ')} → <span style="color:var(--primary);">?</span></div>
+        <div style="font-size:11px; color:var(--muted); margin-top:8px; text-transform:uppercase; letter-spacing:1px;">Tipe: ${pat.type}</div>
+      </div>
+      <input type="text" inputmode="numeric" class="quiz-input" id="quizInput" placeholder="Angka selanjutnya..." autocomplete="off">
+      <div style="font-size:11px; color:var(--muted); margin-top:8px; text-align:center;">Ketik angka selanjutnya - Soal ${currentQuestionProgress}/${totalQuestionsNeeded}</div>
+    `;
+    resetSubmit();
+    const btn=$('#submitQuizBtn');
+    if(btn){ btn.onclick=()=>{ const v=$('#quizInput')?.value.trim(); if(!v) return; if(v===pat.answer) handleCorrect(); else handleWrong(`Salah! Petunjuk: ${pat.hint}. Jawaban: ${pat.answer}`); }; btn.textContent='Cek →'; }
+    setTimeout(()=>$('#quizInput')?.focus(),100);
+  }
+  else if(type==='typing'){
+    const sentences=['Saya bangun pagi dengan semangat dan siap belajar hari ini','Disiplin adalah kunci kesuksesan masa depan saya','Hari ini saya akan lebih produktif dari kemarin','Saya bersyukur masih diberi kesempatan untuk bangun pagi','Fokus, konsisten, dan pantang menyerah sampai tujuan tercapai'];
+    const sentence=sentences[Math.floor(Math.random()*sentences.length)]; currentQuiz={type,answer:sentence}; $('#quizQuestion').textContent='Ketik Ulang Kalimat Ini:'; $('#quizHint').textContent='Harus 100% sama persis, huruf besar kecil & spasi harus benar!'; content.innerHTML=`<div class="typing-display">"<b>${sentence}</b>"</div><input type="text" class="quiz-input" id="quizInput" style="font-size:16px;font-family:inherit;" placeholder="Ketik di sini..." autocomplete="off">`; resetSubmit(); setTimeout(()=>$('#quizInput')?.focus(),100);
+  }
+  else if(type==='puzzle'){
+    const wordsEasy=['BANGUN','PAGI','SEMANGAT','CERIA','FOKUS','RAJIN']; const wordsMedium=['SUKSES','BELAJAR','PRODUKTIF','KONSISTEN','PRESTASI']; const wordsHard=['KEBERHASILAN','PERJUANGAN','KEDISIPLINAN']; const wordsHell=['KEBERHASILANLUARBIASA','KONSISTENSIADALAHKUNCI'];
+    let pool=diff==='easy'?wordsEasy:diff==='medium'?wordsMedium:diff==='hard'?wordsHard:wordsHell; const original=pool[Math.floor(Math.random()*pool.length)];
+    const shuffleWord=(w)=>{ const arr=w.split(''); for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr.join('')===w?shuffleWord(w):arr.join(''); };
+    const scrambled=shuffleWord(original); currentQuiz={type,answer:original,scrambled,attempts:0};
+    $('#quizQuestion').textContent='Susun Kata Ini! 🔤'; $('#quizHint').textContent=`Petunjuk: ${original.length} huruf, diawali ${original[0]}`; 
+    content.innerHTML=`<div class="puzzle-stats"><span>Acak: <b style="letter-spacing:3px;">${scrambled}</b></span><span>🔥 ${currentQuiz.attempts}x</span></div><div class="puzzle-grid" style="grid-template-columns:repeat(${Math.min(scrambled.length,6)},1fr);">${scrambled.split('').map(l=>`<div class="puzzle-tile" style="cursor:default;">${l}</div>`).join('')}</div><input type="text" class="quiz-input" id="quizInput" placeholder="Ketik jawaban..." style="font-size:18px; text-transform:uppercase;">`;
+    resetSubmit(); const btn=$('#submitQuizBtn'); if(btn){ btn.onclick=()=>{ const v=$('#quizInput')?.value.trim().toUpperCase(); if(!v) return; currentQuiz.attempts++; if(v===original) handleCorrect(); else { handleWrong(`Salah! Coba lagi!`); if(currentQuiz.attempts%3===0){ generateQuiz('puzzle',diff); showToast('🔀 Diacak ulang!'); } } }; btn.textContent='Cek Jawaban →'; } setTimeout(()=>$('#quizInput')?.focus(),100);
+  }
+  else if(type==='reverse'){
+    // Kata Terbalik - balik kata biar otak mikir
+    const wordsEasy=['BANGUN','PAGI','CERIA','FOKUS','RAJIN','SEMANGAT'];
+    const wordsMedium=['SUKSES','BELAJAR','DISIPLIN','KONSISTEN','PRESTASI'];
+    const wordsHard=['KEBERHASILAN','PERJUANGAN','PRODUKTIVITAS','KEDISIPLINAN'];
+    const wordsHell=['KEBERHASILANLUARBIASA','PANTANGMENYERAH','KONSISTENSIADALAHKUNCI'];
+    let pool=diff==='easy'?wordsEasy:diff==='medium'?wordsMedium:diff==='hard'?wordsHard:wordsHell;
+    const original=pool[Math.floor(Math.random()*pool.length)];
+    const reversed=original.split('').reverse().join('');
+    currentQuiz={type, answer:original, reversed, original};
+    $('#quizQuestion').textContent=`Balik Kata Ini! 🔠`; 
+    $('#quizHint').textContent=`Kata "${reversed}" kalau dibalik jadi apa? • Soal ${currentQuestionProgress}/${totalQuestionsNeeded} • Petunjuk: ${original.length} huruf`;
+    content.innerHTML=`
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:20px; text-align:center; margin:12px 0;">
+        <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:8px;">Kata Terbalik:</div>
+        <div style="font-family:'JetBrains Mono'; font-size:32px; font-weight:800; letter-spacing:4px; color:var(--primary);">${reversed}</div>
+        <div style="font-size:24px; margin:8px 0;">⬇️</div>
+        <div style="font-family:'JetBrains Mono'; font-size:20px; font-weight:700; letter-spacing:2px; color:var(--muted);">? ? ? ?</div>
+      </div>
+      <input type="text" class="quiz-input" id="quizInput" placeholder="Ketik kata asli..." autocomplete="off" style="font-size:18px; text-transform:uppercase; letter-spacing:2px;">
+      <div style="font-size:11px; color:var(--muted); margin-top:8px; text-align:center;">Balik urutan hurufnya! Contoh: NUGNAB → BANGUN • Soal ${currentQuestionProgress}/${totalQuestionsNeeded}</div>
+    `;
+    resetSubmit();
+    const btn=$('#submitQuizBtn');
+    if(btn){ 
+      btn.onclick=()=>{ 
+        const v=$('#quizInput')?.value.trim().toUpperCase(); 
+        if(!v) return; 
+        if(v===original) handleCorrect(); 
+        else handleWrong(`Salah! "${reversed}" dibalik = "${original}"`); 
+      }; 
+      btn.textContent='Balik →'; 
+    }
+    setTimeout(()=>$('#quizInput')?.focus(),100);
+  }
+  else if(type==='sort'){
+    const count=diff==='easy'?4:diff==='medium'?5:diff==='hard'?6:7;
+    const nums=Array.from({length:count},()=>rand(10,99)).filter((v,i,a)=>a.indexOf(v)===i); while(nums.length<count) { const n=rand(10,99); if(!nums.includes(n)) nums.push(n); }
+    const sorted=[...nums].sort((a,b)=>a-b); const shuffled=[...nums].sort(()=>Math.random()-0.5);
+    currentQuiz={type, sorted, shuffled, clicked:[], attempts:0};
+    $('#quizQuestion').textContent=`Urutkan ${count} Angka - Kecil ke Besar! 🔢`; $('#quizHint').textContent='Tap angka dari yang TERKECIL ke TERBESAR. Salah urutan = ulang dari awal!';
+    const renderSort=()=>{
+      content.innerHTML=`<div class="sort-progress">${currentQuiz.clicked.map(n=>`<div class="sort-progress-item" style="background:var(--success); color:#fff; border-color:var(--success);">${n}</div>`).join('')}${sorted.slice(currentQuiz.clicked.length).map(()=>`<div class="sort-progress-item">?</div>`).join('')}</div><div class="sort-grid">${shuffled.map((n,i)=>{ const isClicked=currentQuiz.clicked.includes(n); const isCorrect=isClicked; return `<div class="sort-tile ${isCorrect?'correct':''}" data-num="${n}" data-idx="${i}" style="${isClicked?'pointer-events:none; opacity:0.4;':''}">${n}</div>`; }).join('')}</div><div style="text-align:center; font-size:11px; color:var(--muted);">Sisa: ${count-currentQuiz.clicked.length} angka lagi</div>`;
+      content.querySelectorAll('.sort-tile:not(.correct)').forEach(tile=>{ tile.addEventListener('click',()=>{ const num=parseInt(tile.dataset.num); const expected=sorted[currentQuiz.clicked.length]; if(num===expected){ currentQuiz.clicked.push(num); if(navigator.vibrate) navigator.vibrate(30); if(currentQuiz.clicked.length===sorted.length){ handleCorrect(); } else { renderSort(); } } else { handleWrong(`Salah! Seharusnya ${expected} dulu, bukan ${num}. Ulang!`); currentQuiz.clicked=[]; currentQuiz.attempts++; renderSort(); } }); });
+      $('#submitQuizBtn').style.display='none';
+    };
+    renderSort();
+  }
+  else if(type==='emoji'){
+    const puzzles=[
+      {emoji:'😴⏰', answer:'BANGUN', hint:'Yang dilakukan pas alarm bunyi'},
+      {emoji:'☕📚', answer:'BELAJAR', hint:'Minum kopi sambil...'},
+      {emoji:'💪🔥', answer:'SEMANGAT', hint:'Butuh ini tiap pagi'},
+      {emoji:'🧠💡', answer:'CERDAS', hint:'Otak cemerlang'},
+      {emoji:'🎯🏆', answer:'SUKSES', hint:'Tujuan akhir'},
+      {emoji:'🌅🏃', answer:'OLAHRAGA', hint:'Lari pagi'},
+      {emoji:'🍎🥗', answer:'SEHAT', hint:'Pola hidup...'},
+      {emoji:'📖✍️', answer:'MENULIS', hint:'Kegiatan dengan buku'},
+      {emoji:'🚀🌟', answer:'MELAMBUNG', hint:'Terbang tinggi'},
+      {emoji:'⏰5️⃣', answer:'JAM5', hint:'Bangun jam...'},
+      {emoji:'💤❌', answer:'JANGANTIDUR', hint:'Lawan ngantuk'},
+      {emoji:'🔥📈', answer:'PRODUKTIF', hint:'Grafik naik'}
+    ];
+    const puz=puzzles[Math.floor(Math.random()*puzzles.length)];
+    currentQuiz={type, answer:puz.answer, emoji:puz.emoji, hint:puz.hint};
+    $('#quizQuestion').textContent=`Soal ${currentQuestionProgress}/${totalQuestionsNeeded} - Tebak dari Emoji! 🧩`; 
+    $('#quizHint').textContent=`Petunjuk: ${puz.hint} • ${puz.answer.length} huruf • Soal ${currentQuestionProgress}/${totalQuestionsNeeded}`;
+    content.innerHTML=`<div class="emoji-display">${puz.emoji}</div><input type="text" class="quiz-input" id="quizInput" placeholder="Jawaban..." style="font-size:18px; text-transform:uppercase;"><div style="font-size:11px; color:var(--muted); margin-top:8px; text-align:center;">Ketik kata yang dimaksud emoji di atas - Soal ${currentQuestionProgress}/${totalQuestionsNeeded}</div>`;
+    resetSubmit(); 
+    const btn=$('#submitQuizBtn'); 
+    if(btn){ 
+      btn.onclick=()=>{ 
+        const v=$('#quizInput')?.value.trim().toUpperCase().replace(/\s/g,''); 
+        const ans=puz.answer.replace(/\s/g,''); 
+        if(!v) return; 
+        if(v===ans || ans.includes(v) || v.includes(ans)){ 
+          handleCorrect(); 
+        } else handleWrong(`Salah! Coba lagi, petunjuk: ${puz.hint}`); 
+      }; 
+      btn.textContent='Cek →'; 
+    } 
+    setTimeout(()=>$('#quizInput')?.focus(),100);
+  }
+  else if(type==='trivia'){
+    const questions=[
+      {q:'Ibu kota Indonesia?', options:['Jakarta','Bandung','Surabaya','Medan'], answer:0},
+      {q:'Planet terdekat Matahari?', options:['Venus','Merkurius','Mars','Bumi'], answer:1},
+      {q:'2 + 2 x 3 = ?', options:['8','10','6','12'], answer:0},
+      {q:'Hewan tercepat di darat?', options:['Singa','Cheetah','Kuda','Elang'], answer:1},
+      {q:'Lambang kimia Air?', options:['O2','H2O','CO2','NaCl'], answer:1},
+      {q:'Benua terbesar?', options:['Afrika','Asia','Eropa','Amerika'], answer:1},
+      {q:'Alat musik petik?', options:['Drum','Gitar','Piano','Terompet'], answer:1},
+      {q:'Warna bendera Indonesia?', options:['Merah Putih','Merah Kuning','Putih Biru','Merah Hitam'], answer:0},
+      {q:'Gunung tertinggi di dunia?', options:['Kilimanjaro','Everest','Fuji','Bromo'], answer:1},
+      {q:'Jumlah provinsi di Indonesia (2024)?', options:['34','38','32','40'], answer:1},
+      {q:'Penemu lampu?', options:['Edison','Tesla','Newton','Einstein'], answer:0},
+      {q:'Ibu kota Jepang?', options:['Seoul','Beijing','Tokyo','Bangkok'], answer:2}
+    ];
+    const qu=questions[Math.floor(Math.random()*questions.length)];
+    currentQuiz={type, answer:qu.options[qu.answer]};
+    $('#quizQuestion').textContent=`Soal ${currentQuestionProgress}/${totalQuestionsNeeded}: ${qu.q}`; 
+    $('#quizHint').textContent=`Pilih jawaban yang benar! Soal ${currentQuestionProgress}/${totalQuestionsNeeded} - Salah = alarm makin keras.`;
+    content.innerHTML=`<div class="trivia-options">${qu.options.map((opt,i)=>`<button class="trivia-opt" data-idx="${i}"><div class="letter">${String.fromCharCode(65+i)}</div>${opt}</button>`).join('')}</div>`;
+    content.querySelectorAll('.trivia-opt').forEach(btn=>{ 
+      btn.addEventListener('click',()=>{ 
+        const idx=parseInt(btn.dataset.idx); 
+        if(idx===qu.answer){ 
+          handleCorrect(); 
+        } else { 
+          btn.classList.add('wrong'); 
+          handleWrong(`Salah! Jawaban benar: ${qu.options[qu.answer]}`); 
+          setTimeout(()=>generateQuiz('trivia',diff),800); 
+        } 
+      }); 
+    });
+    $('#submitQuizBtn').style.display='none';
+  }
+  const inp=$('#quizInput'); if(inp){ inp.addEventListener('keydown',e=>{ if(e.key==='Enter') checkAnswer(); }); }
+  // Update badge dengan progress soal yang akurat
+  $('#quizBadge').textContent=`${type.toUpperCase()} • ${diff.toUpperCase()} • ${currentQuestionProgress}/${totalQuestionsNeeded}`;
+  $('#snoozeInfo').textContent=`Soal ${currentQuestionProgress}/${totalQuestionsNeeded} • Snooze: ${snoozeCount}/3`;
+}
+function showMemoryInput(){
+  const content=$('#quizContent'); $('#quizQuestion').textContent='Ulangi urutan tadi!'; const emojis=['🔴','🔵','🟡','🟢','🟣','🟠'];
+  content.innerHTML=`<div class="memory-grid">${emojis.map(e=>`<div class="memory-cell" data-emoji="${e}">${e}</div>`).join('')}</div><div style="display:flex;gap:8px;margin-top:12px;"><div id="memAnswer" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;min-height:50px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:20px;"></div><button class="btn-snooze" onclick="clearMem()">Hapus</button></div>`;
+  let userSeq=[]; content.querySelectorAll('.memory-cell').forEach(cell=>{ cell.addEventListener('click',()=>{ const e=cell.dataset.emoji; userSeq.push(e); $('#memAnswer').innerHTML+=`<span>${e}</span>`; cell.classList.add('active'); setTimeout(()=>cell.classList.remove('active'),200); if(userSeq.length===currentQuiz.seq.length){ const userAns=userSeq.join(''); if(userAns===currentQuiz.answer) handleCorrect(); else { handleWrong(`Salah! Yang benar: ${currentQuiz.seq.join(' ')}`); userSeq=[]; $('#memAnswer').innerHTML=''; } } }); }); window.clearMem=()=>{ userSeq=[]; $('#memAnswer').innerHTML=''; };
+}
+function checkAnswer(){
+  if(!currentQuiz) return; if(['puzzle','logic','reverse','sort','emoji','trivia'].includes(currentQuiz.type)) return;
+  const input=$('#quizInput'); if(!input) return; const val=input.value.trim(); if(!val){ input.classList.add('shake'); setTimeout(()=>input.classList.remove('shake'),400); return; }
+  if(val.toUpperCase()===currentQuiz.answer.toUpperCase() || val===currentQuiz.answer) handleCorrect(); else handleWrong(currentQuiz.type==='math'?'Jawaban salah! Coba lagi!':'Belum sama persis!');
+}
+function handleWrong(msg){ showToast('❌ '+msg); const inp=$('#quizInput'); if(inp){ inp.classList.add('shake'); inp.value=''; setTimeout(()=>inp.classList.remove('shake'),400); } if(gainNode&&audioCtx){ const cv=gainNode.gain.value; gainNode.gain.setValueAtTime(Math.min(cv+0.15,1.2), audioCtx.currentTime); } if(ringingAlarm&&currentQuiz.type==='math'){ setTimeout(()=>generateQuiz(ringingAlarm.quizType, ringingAlarm.difficulty),600); } if(navigator.vibrate) navigator.vibrate([300,100,300]); }
+function handleCorrect(){
+  // Cek apakah masih ada soal lagi yang harus dijawab?
+  if(currentQuestionProgress < totalQuestionsNeeded){
+    currentQuestionProgress++;
+    const nextType=currentQuizSequence[currentQuestionProgress-1] || ringingAlarm?.quizType || 'math';
+    // Update UI progress
+    $('#snoozeInfo').textContent=`Soal ${currentQuestionProgress}/${totalQuestionsNeeded} [${nextType}] • Snooze: ${snoozeCount}/3`;
+    $('#quizBadge').textContent=`${nextType.toUpperCase()} • ${ringingAlarm?.difficulty.toUpperCase()} • ${currentQuestionProgress}/${totalQuestionsNeeded}`;
+    showToast(`✅ Soal ${currentQuestionProgress-1}/${totalQuestionsNeeded} benar! Lanjut ${nextType} (${currentQuestionProgress}/${totalQuestionsNeeded}) 🔥`);
+    if(navigator.vibrate) navigator.vibrate([100,50,100]);
+    // Generate soal baru dengan tipe berikutnya
+    setTimeout(()=>{ 
+      if(ringingAlarm) generateQuiz(nextType, ringingAlarm.difficulty); 
+    }, 600);
+    return; // JANGAN matikan alarm dulu!
+  }
+
+  // Kalau sudah selesai semua soal, baru matikan alarm
+  stopAlarmSound(); 
+  $('#alarmOverlay').classList.remove('active'); 
+  window.onpopstate=null; 
+  document.body.style.overflow=''; 
+  document.documentElement.style.overflow=''; 
+  stats.total++; stats.onTime++; stats.questions+=totalQuestionsNeeded; streak++; saveStats(); updateStatsUI(); 
+  const seqNames=currentQuizSequence.join('→');
+  showToast(`🎉 Mantap ${currentUser?.name}! Berhasil ${totalQuestionsNeeded} soal [${seqNames}]! Alarm mati. Streak ${streak} 🔥`); 
+  if(navigator.vibrate) navigator.vibrate([100,50,100,50,200]); 
+  ringingAlarm=null; snoozeCount=0; 
+  totalQuestionsNeeded=3; currentQuestionProgress=1; currentQuizSequence=[];
+}
+function doSnooze(){ 
+  if(snoozeCount>=3){ showToast('❌ Snooze habis! Selesaikan kuis!'); return; } 
+  snoozeCount++; stopAlarmSound(); 
+  $('#alarmOverlay').classList.remove('active'); 
+  window.onpopstate=null; 
+  document.body.style.overflow=''; 
+  document.documentElement.style.overflow=''; 
+  showToast(`😴 Snooze ${snoozeCount}/3 - 5 menit lagi (Sisa ${totalQuestionsNeeded-currentQuestionProgress+1} soal)`); 
+  const now=new Date(); now.setMinutes(now.getMinutes()+5); const snoozeTime=now.toTimeString().slice(0,5); 
+  // Simpan progress soal saat snooze, jadi nanti lanjut dari soal yang sama
+  const snoozeAlarm={
+    id:Date.now(),
+    time:snoozeTime,
+    label:(ringingAlarm?.label||'Snooze')+` (Snooze sisa ${totalQuestionsNeeded-currentQuestionProgress+1} soal)`,
+    quizType:currentQuizSequence[currentQuestionProgress-1]||ringingAlarm?.quizType||'math',
+    quizTypes:[...currentQuizSequence],
+    quizSequence:currentQuizSequence.slice(currentQuestionProgress-1),
+    questionCount:totalQuestionsNeeded-currentQuestionProgress+1,
+    difficulty:snoozeCount===1?'medium':snoozeCount===2?'hard':'hell',
+    ringtone:'aggressive',
+    enabled:true,
+    isSnooze:true,
+    owner:currentUser?.email
+  }; 
+  alarms.push(snoozeAlarm); saveAlarms(); renderAlarms(); 
+  ringingAlarm=null; 
+  totalQuestionsNeeded=3; currentQuestionProgress=1; currentQuizSequence=[];
+}
+function updateStatsUI(){ $('#statTotal').textContent=stats.total; $('#statStreak').textContent=streak; const el=$('#statOnTime'); if(el) el.textContent=stats.total?Math.round((stats.onTime/stats.total)*100)+'%':'0%'; }
+function startAlarmSound(type){
+  try{
+    stopAlarmSound(); audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume();
+    gainNode=audioCtx.createGain(); const panner=audioCtx.createStereoPanner?audioCtx.createStereoPanner():null; if(panner){ panner.pan.value=0; panner.connect(audioCtx.destination); gainNode.connect(panner); } else gainNode.connect(audioCtx.destination); gainNode.gain.value=0.0001;
+    if(type==='digital'){ const osc=audioCtx.createOscillator(); osc.type='sine'; osc.frequency.value=880; osc.connect(gainNode); osc.start(); oscillators=[osc]; gainNode.gain.linearRampToValueAtTime(0.35,audioCtx.currentTime+0.05); let isOn=true; alarmInterval=setInterval(()=>{ isOn=!isOn; const now=audioCtx.currentTime; gainNode.gain.cancelScheduledValues(now); gainNode.gain.setValueAtTime(gainNode.gain.value,now); gainNode.gain.linearRampToValueAtTime(isOn?0.35:0.0001,now+0.05); }, isOn?300:200); }
+    else if(type==='alarm'){ const osc=audioCtx.createOscillator(); osc.type='sine'; osc.frequency.value=650; osc.connect(gainNode); osc.start(); oscillators=[osc]; gainNode.gain.linearRampToValueAtTime(0.35,audioCtx.currentTime+0.1); let high=false; alarmInterval=setInterval(()=>{ high=!high; const now=audioCtx.currentTime; osc.frequency.cancelScheduledValues(now); osc.frequency.setValueAtTime(osc.frequency.value,now); osc.frequency.linearRampToValueAtTime(high?850:650,now+0.08); },500); }
+    else { const osc=audioCtx.createOscillator(); osc.type='sine'; osc.frequency.value=500; osc.connect(gainNode); osc.start(); oscillators=[osc]; gainNode.gain.linearRampToValueAtTime(0.32,audioCtx.currentTime+0.1); let up=true; alarmInterval=setInterval(()=>{ const now=audioCtx.currentTime; const target=up?1200:400; osc.frequency.cancelScheduledValues(now); osc.frequency.setValueAtTime(osc.frequency.value,now); osc.frequency.linearRampToValueAtTime(target,now+0.9); up=!up; },900); }
+  }catch(e){ console.log('Audio failed',e); }
+}
+function stopAlarmSound(){ try{ if(alarmInterval){ clearInterval(alarmInterval); alarmInterval=null; } if(gainNode&&audioCtx){ const now=audioCtx.currentTime; gainNode.gain.cancelScheduledValues(now); gainNode.gain.setValueAtTime(gainNode.gain.value,now); gainNode.gain.linearRampToValueAtTime(0.0001,now+0.15); setTimeout(()=>{ oscillators.forEach(o=>{ try{o.stop();}catch{} }); oscillators=[]; if(audioCtx){ try{audioCtx.close();}catch{} audioCtx=null; } },200); } else { oscillators.forEach(o=>{ try{o.stop();}catch{} }); oscillators=[]; if(audioCtx){ try{audioCtx.close();}catch{} audioCtx=null; } } }catch(e){} }
+$('#currentTime')?.addEventListener('dblclick',()=>{ if(!alarms.length) return showToast('Pasang alarm dulu!'); const demo=alarms.find(a=>a.enabled)||alarms[0]; triggerAlarm(demo); });
+checkAuthState();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a39c77230a227d67',t:'MTc4OTE5MDQ1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
